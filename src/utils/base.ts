@@ -17,7 +17,7 @@ import { withoutBase, withoutTrailingSlash } from "./internal/path.ts";
 export function withBase<_RequestT extends EventHandlerRequest = EventHandlerRequest>(
   base: string,
   input: HTTPHandler<_RequestT>,
-): EventHandler {
+): EventHandler<_RequestT> {
   base = withoutTrailingSlash(base);
 
   const handler = toEventHandler(input);

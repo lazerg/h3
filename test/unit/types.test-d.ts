@@ -14,6 +14,9 @@ import {
   getValidatedQuery,
   defineValidatedHandler,
   defineWebSocketHandler,
+  defineLazyEventHandler,
+  toEventHandler,
+  withBase,
 } from "../../src/index.ts";
 import {
   appendHeaders,
@@ -24,6 +27,8 @@ import {
 import { z } from "zod";
 
 describe("types", () => {
+  type ReqOf<H> = H extends (event: H3Event<infer R>) => any ? R : never;
+
   describe("eventHandler", () => {
     it("return type (inferred)", () => {
       const handler = defineHandler(() => {
@@ -103,8 +108,6 @@ describe("types", () => {
   });
 
   describe("defineValidatedHandler", () => {
-    type ReqOf<H> = H extends (event: H3Event<infer R>) => any ? R : never;
-
     it("returned handler exposes validated body, query and headers", () => {
       const handler = defineValidatedHandler({
         validate: {
@@ -163,6 +166,33 @@ describe("types", () => {
         expectTypeOf(event).toEqualTypeOf<H3Event<EventHandlerRequest>>();
         return "ok";
       });
+
+      new H3().on("GET", "/", (event) => {
+        expectTypeOf(event).toEqualTypeOf<H3Event<EventHandlerRequest>>();
+        return "ok";
+      });
+    });
+  });
+
+  describe("handler passthrough", () => {
+    const handler = defineValidatedHandler({
+      validate: { body: z.object({ title: z.string() }) },
+      handler: () => "ok",
+    });
+
+    it("keeps the request type through toEventHandler", () => {
+      const normalized = toEventHandler(handler)!;
+      expectTypeOf<ReqOf<typeof normalized>["body"]>().toEqualTypeOf<{ title: string }>();
+    });
+
+    it("keeps the request type through withBase", () => {
+      const based = withBase("/api", handler);
+      expectTypeOf<ReqOf<typeof based>["body"]>().toEqualTypeOf<{ title: string }>();
+    });
+
+    it("keeps the request type through defineLazyEventHandler", () => {
+      const lazy = defineLazyEventHandler(() => handler);
+      expectTypeOf<ReqOf<typeof lazy>["body"]>().toEqualTypeOf<{ title: string }>();
     });
   });
 
