@@ -1,7 +1,8 @@
 import type {
+  EventHandler,
   EventHandlerRequest,
-  H3Event,
   HTTPHandler,
+  H3Event,
   RouteRules,
   WebSocketResponse,
 } from "../../src/index.ts";
@@ -162,16 +163,22 @@ describe("types", () => {
   });
 
   describe("routes", () => {
-    it("types the event of an inline route handler", () => {
+    it("types the event of an inline method handler", () => {
       new H3().get("/", (event) => {
         expectTypeOf(event).toEqualTypeOf<H3Event<EventHandlerRequest>>();
         return "ok";
       });
+    });
 
+    it("types the event of an inline `on` handler", () => {
       new H3().on("GET", "/", (event) => {
         expectTypeOf(event).toEqualTypeOf<H3Event<EventHandlerRequest>>();
         return "ok";
       });
+    });
+
+    it("accepts a handler with a concrete request type in an untyped slot", () => {
+      expectTypeOf<EventHandler<{ body: { id: string } }>>().toExtend<HTTPHandler>();
     });
   });
 

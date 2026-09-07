@@ -154,6 +154,17 @@ export declare class H3Core {
   "~addRoute"(_route: H3Route): void;
 }
 
+/**
+ * Registers a route handler, inferring the handler request type when it has one.
+ */
+export interface RouteRegistrar<T> {
+  <_RequestT extends EventHandlerRequest = EventHandlerRequest>(
+    route: string,
+    handler: HTTPHandler<_RequestT>,
+    opts?: RouteOptions,
+  ): T;
+}
+
 export declare class H3 extends H3Core {
   /** @internal */
   "~rou3": RouterContext;
@@ -204,60 +215,15 @@ export declare class H3 extends H3Core {
   /**
    * Register a route handler for all HTTP methods.
    */
-  all<_RequestT extends EventHandlerRequest = EventHandlerRequest>(
-    route: string,
-    handler: HTTPHandler<_RequestT>,
-    opts?: RouteOptions,
-  ): this;
-
-  get<_RequestT extends EventHandlerRequest = EventHandlerRequest>(
-    route: string,
-    handler: HTTPHandler<_RequestT>,
-    opts?: RouteOptions,
-  ): this;
-  post<_RequestT extends EventHandlerRequest = EventHandlerRequest>(
-    route: string,
-    handler: HTTPHandler<_RequestT>,
-    opts?: RouteOptions,
-  ): this;
-  put<_RequestT extends EventHandlerRequest = EventHandlerRequest>(
-    route: string,
-    handler: HTTPHandler<_RequestT>,
-    opts?: RouteOptions,
-  ): this;
-  delete<_RequestT extends EventHandlerRequest = EventHandlerRequest>(
-    route: string,
-    handler: HTTPHandler<_RequestT>,
-    opts?: RouteOptions,
-  ): this;
-  patch<_RequestT extends EventHandlerRequest = EventHandlerRequest>(
-    route: string,
-    handler: HTTPHandler<_RequestT>,
-    opts?: RouteOptions,
-  ): this;
-  head<_RequestT extends EventHandlerRequest = EventHandlerRequest>(
-    route: string,
-    handler: HTTPHandler<_RequestT>,
-    opts?: RouteOptions,
-  ): this;
-  options<_RequestT extends EventHandlerRequest = EventHandlerRequest>(
-    route: string,
-    handler: HTTPHandler<_RequestT>,
-    opts?: RouteOptions,
-  ): this;
-  connect<_RequestT extends EventHandlerRequest = EventHandlerRequest>(
-    route: string,
-    handler: HTTPHandler<_RequestT>,
-    opts?: RouteOptions,
-  ): this;
-  trace<_RequestT extends EventHandlerRequest = EventHandlerRequest>(
-    route: string,
-    handler: HTTPHandler<_RequestT>,
-    opts?: RouteOptions,
-  ): this;
-  query<_RequestT extends EventHandlerRequest = EventHandlerRequest>(
-    route: string,
-    handler: HTTPHandler<_RequestT>,
-    opts?: RouteOptions,
-  ): this;
+  all: RouteRegistrar<this>;
+  get: RouteRegistrar<this>;
+  post: RouteRegistrar<this>;
+  put: RouteRegistrar<this>;
+  delete: RouteRegistrar<this>;
+  patch: RouteRegistrar<this>;
+  head: RouteRegistrar<this>;
+  options: RouteRegistrar<this>;
+  connect: RouteRegistrar<this>;
+  trace: RouteRegistrar<this>;
+  query: RouteRegistrar<this>;
 }
