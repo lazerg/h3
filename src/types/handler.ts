@@ -10,6 +10,18 @@ export type HTTPHandler<_RequestT extends EventHandlerRequest = any> =
   | FetchableObject
   | H3Core;
 
+/**
+ * `HTTPHandler` defaults its request type to `any` so that a bare `HTTPHandler`
+ * annotation still accepts handlers with a narrower request type. When a handler
+ * util infers that `any` back, this collapses it to the default request shape so
+ * `any` never reaches a public return type.
+ */
+export type ResolvedRequest<_RequestT> = 0 extends 1 & _RequestT
+  ? EventHandlerRequest
+  : _RequestT extends EventHandlerRequest
+    ? _RequestT
+    : EventHandlerRequest;
+
 //  --- event handler ---
 
 export interface EventHandler<

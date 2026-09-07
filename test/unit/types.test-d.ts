@@ -1,6 +1,7 @@
 import type {
   EventHandlerRequest,
   H3Event,
+  HTTPHandler,
   RouteRules,
   WebSocketResponse,
 } from "../../src/index.ts";
@@ -193,6 +194,28 @@ describe("types", () => {
     it("keeps the request type through defineLazyEventHandler", () => {
       const lazy = defineLazyEventHandler(() => handler);
       expectTypeOf<ReqOf<typeof lazy>["body"]>().toEqualTypeOf<{ title: string }>();
+    });
+
+    it("does not leak any for a plain HTTPHandler", () => {
+      const plain = handler as HTTPHandler;
+
+      const normalized = toEventHandler(plain)!;
+      expectTypeOf<ReqOf<typeof normalized>>().not.toBeAny();
+      expectTypeOf<ReqOf<typeof normalized>>().toEqualTypeOf<EventHandlerRequest>();
+
+      const based = withBase("/api", plain);
+      expectTypeOf<ReqOf<typeof based>>().not.toBeAny();
+      expectTypeOf<ReqOf<typeof based>>().toEqualTypeOf<EventHandlerRequest>();
+
+      const lazy = defineLazyEventHandler(() => plain);
+      expectTypeOf<ReqOf<typeof lazy>>().not.toBeAny();
+      expectTypeOf<ReqOf<typeof lazy>>().toEqualTypeOf<EventHandlerRequest>();
+    });
+
+    it("uses the default request type for an H3 instance", () => {
+      const normalized = toEventHandler(new H3())!;
+      expectTypeOf<ReqOf<typeof normalized>>().not.toBeAny();
+      expectTypeOf<ReqOf<typeof normalized>>().toEqualTypeOf<EventHandlerRequest>();
     });
   });
 

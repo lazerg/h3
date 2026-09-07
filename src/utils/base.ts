@@ -1,4 +1,9 @@
-import type { EventHandler, EventHandlerRequest, HTTPHandler } from "../types/handler.ts";
+import type {
+  EventHandler,
+  EventHandlerRequest,
+  HTTPHandler,
+  ResolvedRequest,
+} from "../types/handler.ts";
 import { toEventHandler } from "../handler.ts";
 import { withoutBase, withoutTrailingSlash } from "./internal/path.ts";
 
@@ -17,7 +22,7 @@ import { withoutBase, withoutTrailingSlash } from "./internal/path.ts";
 export function withBase<_RequestT extends EventHandlerRequest = EventHandlerRequest>(
   base: string,
   input: HTTPHandler<_RequestT>,
-): EventHandler<_RequestT> {
+): EventHandler<ResolvedRequest<_RequestT>> {
   base = withoutTrailingSlash(base);
 
   const handler = toEventHandler(input);
